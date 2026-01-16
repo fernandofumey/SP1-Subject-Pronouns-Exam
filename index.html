@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish 1: Subject Pronouns Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden-section { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-emerald-900 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold uppercase tracking-wider">Subject Pronouns Exam</h1>
+                <p class="text-xs text-emerald-200">Spanish 1 • Beginner Level</p>
+            </div>
+            <button onclick="toggleTeacherModal()" class="text-xs bg-emerald-800 hover:bg-emerald-700 px-3 py-1 rounded transition cursor-pointer border border-emerald-600">
+                <i class="fas fa-lock mr-1"></i> Teacher Access
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto p-6">
+        
+        <!-- Student Login Form -->
+        <div id="student-login" class="bg-white p-8 rounded-xl shadow-lg fade-in border-t-4 border-emerald-600">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Student Identification</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">First Name</label>
+                    <input type="text" id="fname" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Enter your first name">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Last Name</label>
+                    <input type="text" id="lname" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Enter your last name">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Period</label>
+                    <select id="period" class="w-full p-3 border rounded-lg bg-white">
+                        <option>1st</option>
+                        <option>A2</option>
+                        <option>A4</option>
+                        <option>B3</option>
+                        <option>B4</option>
+                        <option>5th</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="startQuiz()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition transform hover:scale-[1.01] shadow-md">
+                Start Exam
+            </button>
+        </div>
+
+        <!-- Quiz Container (Hidden initially) -->
+        <div id="quiz-container" class="hidden-section fade-in">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-emerald-50 p-4 border-b border-emerald-100 flex justify-between items-center">
+                    <span id="student-display" class="font-semibold text-emerald-800"></span>
+                    <span class="text-sm text-gray-500 font-mono bg-emerald-100 px-2 py-1 rounded">50 Questions (Randomized)</span>
+                </div>
+                <div id="questions-list" class="p-6 space-y-8">
+                    <!-- Questions injected via JS -->
+                </div>
+                <div class="p-6 bg-gray-50 border-t flex justify-center">
+                    <button onclick="submitExam()" class="bg-green-600 hover:bg-green-700 text-white text-lg font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                        Submit Exam
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Section (Hidden initially) -->
+        <div id="result-container" class="hidden-section fade-in text-center py-10">
+            <div class="bg-white p-8 rounded-xl shadow-xl max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-3xl text-green-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Exam Completed!</h2>
+                <p class="text-gray-600 mb-6">Your score has been recorded.</p>
+                
+                <div class="bg-gray-100 p-4 rounded-lg mb-8">
+                    <p class="text-sm text-gray-500 uppercase tracking-wide">Final Score</p>
+                    <p id="final-score-display" class="text-5xl font-bold text-emerald-900 mt-2">0%</p>
+                </div>
+
+                <!-- High Visibility Warning -->
+                <div class="bg-red-600 border-4 border-red-800 p-6 rounded-xl text-center text-white mb-8 shadow-2xl">
+                    <i class="fas fa-file-download text-5xl mb-4 text-yellow-300 animate-bounce"></i>
+                    <h3 class="text-2xl font-black uppercase mb-4 tracking-wide border-b-2 border-red-400 pb-2">⚠ ACTION REQUIRED ⚠</h3>
+                    <p class="text-xl font-bold leading-tight mb-2">
+                        DOWNLOAD THE FILE AND SEND IT TO YOUR TEACHER!!!
+                    </p>
+                    <p class="text-lg">
+                        Look for <code id="filename-display" class="bg-white text-red-600 px-2 py-1 rounded font-mono font-bold mx-1 text-base">result.csv</code> in your downloads folder.
+                    </p>
+                </div>
+
+                <!-- Manual Download Button -->
+                <div class="mb-6">
+                    <p class="text-sm text-gray-500 mb-2">Did the file not download automatically?</p>
+                    <button onclick="downloadResult(lastResultData)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition flex items-center justify-center mx-auto gap-2">
+                        <i class="fas fa-download"></i> Download File Again
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Dashboard (Hidden) -->
+        <div id="teacher-dashboard" class="hidden-section fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-purple-600">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 class="text-2xl font-bold text-gray-800"><i class="fas fa-chalkboard-teacher text-purple-600 mr-2"></i>Teacher Dashboard</h2>
+                    <button onclick="logoutTeacher()" class="text-red-500 hover:text-red-700 font-medium">Logout</button>
+                </div>
+
+                <!-- Data Import -->
+                <div class="bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-xl p-8 text-center mb-8 hover:bg-emerald-100 transition cursor-pointer" ondragover="event.preventDefault()" ondrop="handleDrop(event)" onclick="document.getElementById('file-upload').click()">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-emerald-400 mb-3"></i>
+                    <p class="font-semibold text-emerald-900">Upload Student Results</p>
+                    <p class="text-sm text-emerald-600 mb-4">Drag & drop student <strong>.csv</strong> files here or click to select</p>
+                    <input type="file" id="file-upload" multiple class="hidden" onchange="handleFiles(this.files)" accept=".csv">
+                    <button class="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition pointer-events-none">Select Files</button>
+                </div>
+
+                <!-- Statistics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white border rounded-xl p-4 shadow-sm">
+                        <p class="text-gray-500 text-sm">Total Students</p>
+                        <p id="stat-count" class="text-3xl font-bold text-gray-800">0</p>
+                    </div>
+                    <div class="bg-white border rounded-xl p-4 shadow-sm">
+                        <p class="text-gray-500 text-sm">Average Score</p>
+                        <p id="stat-avg" class="text-3xl font-bold text-emerald-600">0%</p>
+                    </div>
+                    <div class="bg-white border rounded-xl p-4 shadow-sm">
+                        <p class="text-gray-500 text-sm">Highest Score</p>
+                        <p id="stat-high" class="text-3xl font-bold text-green-600">0%</p>
+                    </div>
+                </div>
+
+                <!-- Top 3 Missed -->
+                <div class="bg-red-50 rounded-xl p-6 mb-8 border border-red-100">
+                    <h3 class="text-lg font-bold text-red-800 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>Top 3 Most Missed Questions</h3>
+                    <div id="missed-questions-list" class="space-y-3">
+                        <p class="text-gray-500 italic">Upload data to see insights.</p>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b">
+                                <th class="p-4 font-semibold text-gray-600">Name</th>
+                                <th class="p-4 font-semibold text-gray-600">Period</th>
+                                <th class="p-4 font-semibold text-gray-600">Score</th>
+                                <th class="p-4 font-semibold text-gray-600">Missed Q#</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Rows injected JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[100] backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-key text-emerald-600"></i> Teacher Access</h3>
+            <input type="password" id="teacher-pwd" class="w-full border p-3 rounded-lg mb-4 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Enter Password" onkeydown="if(event.key === 'Enter') verifyTeacher()">
+            <p id="pwd-error" class="text-red-500 text-sm mb-4 hidden bg-red-50 p-2 rounded border border-red-100"><i class="fas fa-times-circle"></i> Incorrect password</p>
+            <div class="flex justify-end gap-2">
+                <button onclick="toggleTeacherModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Cancel</button>
+                <button onclick="verifyTeacher()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition shadow">Login</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// --- Configuration ---
+const TEACHER_PASSWORD = "admin"; // CHANGE THIS PASSWORD
+
+// --- 50 Questions Data (Spanish 1 Subject Pronouns) ---
+// Note: 'a' is the index of the correct answer in the 'options' array.
+const quizData = [
+    // 1-10: Basic Translation (English to Spanish)
+    { q: "How do you say 'I' in Spanish?", options: ["Yo", "Tú", "Él", "Ella"], a: 0 },
+    { q: "How do you say 'He' in Spanish?", options: ["Usted", "Él", "Nosotros", "Yo"], a: 1 },
+    { q: "How do you say 'She' in Spanish?", options: ["Ellas", "Tú", "Ella", "Ustedes"], a: 2 },
+    { q: "How do you say 'We' (mixed group) in Spanish?", options: ["Nosotras", "Vosotros", "Ellos", "Nosotros"], a: 3 },
+    { q: "How do you say 'They' (all girls) in Spanish?", options: ["Ellos", "Ellas", "Ustedes", "Nosotras"], a: 1 },
+    { q: "How do you say 'They' (all boys) in Spanish?", options: ["Ellos", "Ellas", "Ustedes", "Vosotros"], a: 0 },
+    { q: "How do you say 'You' (formal/singular) in Spanish?", options: ["Tú", "Usted", "Ustedes", "Él"], a: 1 },
+    { q: "How do you say 'You' (informal/singular) in Spanish?", options: ["Usted", "Yo", "Tú", "Ella"], a: 2 },
+    { q: "How do you say 'You all' (Latin America) in Spanish?", options: ["Vosotros", "Ustedes", "Ellos", "Nosotros"], a: 1 },
+    { q: "How do you say 'You all' (Spain/Informal) in Spanish?", options: ["Ustedes", "Ellos", "Vosotros", "Nosotros"], a: 2 },
+
+    // 11-20: Replacing Names (Talking ABOUT people)
+    { q: "Which pronoun replaces 'Marta'?", options: ["Él", "Ella", "Tú", "Yo"], a: 1 },
+    { q: "Which pronoun replaces 'Pablo'?", options: ["Él", "Ella", "Usted", "Nosotros"], a: 0 },
+    { q: "Which pronoun replaces 'Marta y Pablo'?", options: ["Ellas", "Ellos", "Nosotros", "Ustedes"], a: 1 },
+    { q: "Which pronoun replaces 'Ana y Maria'?", options: ["Ellos", "Nosotras", "Ellas", "Vosotras"], a: 2 },
+    { q: "Which pronoun replaces 'El chico'?", options: ["Ella", "Él", "Tú", "Usted"], a: 1 },
+    { q: "Which pronoun replaces 'La chica'?", options: ["Él", "Ella", "Yo", "Usted"], a: 1 },
+    { q: "Which pronoun replaces 'Los estudiantes'?", options: ["Ellos", "Ellas", "Ustedes", "Nosotros"], a: 0 },
+    { q: "Which pronoun replaces 'Las maestras'?", options: ["Ellos", "Ellas", "Nosotras", "Ustedes"], a: 1 },
+    { q: "Which pronoun replaces 'El Sr. Lopez' (talking about him)?", options: ["Tú", "Usted", "Él", "Ella"], a: 2 },
+    { q: "Which pronoun replaces 'La Sra. Garcia' (talking about her)?", options: ["Ella", "Usted", "Tú", "Yo"], a: 0 },
+
+    // 21-30: "And I" / "And You" Logic
+    { q: "Which pronoun replaces 'Juan y yo'?", options: ["Ellos", "Ustedes", "Nosotros", "Vosotros"], a: 2 },
+    { q: "Which pronoun replaces 'Maria y yo' (all female)?", options: ["Nosotros", "Nosotras", "Ellas", "Ustedes"], a: 1 },
+    { q: "Which pronoun replaces 'Tú y yo'?", options: ["Ustedes", "Ellos", "Nosotros", "Yo"], a: 2 },
+    { q: "Which pronoun replaces 'Juan y tú' (in Latin America)?", options: ["Vosotros", "Ellos", "Ustedes", "Nosotros"], a: 2 },
+    { q: "Which pronoun replaces 'Ana y tú' (in Spain)?", options: ["Vosotros", "Ustedes", "Ellas", "Nosotros"], a: 0 },
+    { q: "If you are in the group, the pronoun must be...", options: ["First person (Nosotros)", "Third person (Ellos)", "Second person (Ustedes)", "Singular (Yo)"], a: 0 },
+    { q: "If you are talking TO a group of people (not in Spain), use...", options: ["Ellos", "Nosotros", "Ustedes", "Vosotros"], a: 2 },
+    { q: "To say 'My friend and I', use...", options: ["Ellos", "Nosotros", "Ustedes", "Yo"], a: 1 },
+    { q: "To say 'You and Paul' (formal context), use...", options: ["Ustedes", "Vosotros", "Nosotros", "Ellos"], a: 0 },
+    { q: "To say 'The girls and I' (all female group), use...", options: ["Nosotras", "Nosotros", "Ellas", "Ustedes"], a: 0 },
+
+    // 31-40: Formal vs. Informal (Tú vs. Usted)
+    { q: "Talking TO your best friend:", options: ["Tú", "Usted", "Él", "Ella"], a: 0 },
+    { q: "Talking TO your principal:", options: ["Tú", "Usted", "Él", "Yo"], a: 1 },
+    { q: "Talking TO a police officer:", options: ["Tú", "Usted", "Ella", "Nosotros"], a: 1 },
+    { q: "Talking TO a dog or baby:", options: ["Usted", "Tú", "Él", "Ella"], a: 1 },
+    { q: "Talking TO an elderly person you don't know:", options: ["Tú", "Usted", "Ellos", "Yo"], a: 1 },
+    { q: "Talking TO your brother:", options: ["Usted", "Tú", "Él", "Nosotros"], a: 1 },
+    { q: "Talking TO Mr. Rodriguez:", options: ["Tú", "Usted", "Él", "Ellos"], a: 1 },
+    { q: "Talking TO Mrs. Smith:", options: ["Ella", "Tú", "Usted", "Nosotras"], a: 2 },
+    { q: "Talking TO a classmate:", options: ["Usted", "Tú", "Ella", "Él"], a: 1 },
+    { q: "Talking TO the President:", options: ["Tú", "Usted", "Él", "Yo"], a: 1 },
+
+    // 41-50: Mixed/Tricky Scenarios
+    { q: "A group of 99 girls and 1 boy:", options: ["Ellas", "Ellos", "Nosotras", "Ustedes"], a: 1 },
+    { q: "Talking about yourself:", options: ["Tú", "Él", "Yo", "Usted"], a: 2 },
+    { q: "Talking about a group of objects (masculine):", options: ["Ellos", "Ellas", "Nosotros", "Ustedes"], a: 0 },
+    { q: "Talking about a group of chairs (sillas - feminine):", options: ["Ellos", "Ellas", "Nosotras", "Vosotras"], a: 1 },
+    { q: "The abbreviation 'Ud.' stands for:", options: ["Ustedes", "Unidad", "Usted", "Union"], a: 2 },
+    { q: "The abbreviation 'Uds.' stands for:", options: ["Usted", "Unidos", "Ustedes", "Usamos"], a: 2 },
+    { q: "Is 'Vosotros' used in Mexico?", options: ["Yes", "No"], a: 1 },
+    { q: "Which pronoun is singular?", options: ["Nosotros", "Ellas", "Ella", "Ustedes"], a: 2 },
+    { q: "Which pronoun is plural?", options: ["Yo", "Tú", "Usted", "Ellos"], a: 3 },
+    { q: "When referring to 'People' generally (La gente), use:", options: ["Ellos (Plural)", "Ella (Singular)", "Nosotros", "Yo"], a: 1 }
+];
+
+let studentData = {
+    fname: "",
+    lname: "",
+    period: "",
+    answers: [] 
+};
+
+let lastResultData = null;
+let currentSessionQuiz = []; // Holds the randomized quiz for the current student
+
+// --- Utility: Fisher-Yates Shuffle ---
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// --- Student Flow ---
+
+function startQuiz() {
+    const f = document.getElementById('fname').value.trim();
+    const l = document.getElementById('lname').value.trim();
+    const p = document.getElementById('period').value;
+
+    if (!f || !l) {
+        alert("Please enter your full name.");
+        return;
+    }
+
+    studentData.fname = f;
+    studentData.lname = l;
+    studentData.period = p;
+
+    // --- RANDOMIZATION LOGIC ---
+    currentSessionQuiz = quizData.map((item, index) => ({
+        ...item,
+        originalIndex: index,
+        options: [...item.options]
+    }));
+
+    shuffleArray(currentSessionQuiz);
+
+    currentSessionQuiz.forEach(q => {
+        let correctText = quizData[q.originalIndex].options[q.a];
+        shuffleArray(q.options);
+        q.a = q.options.indexOf(correctText);
+    });
+
+    document.getElementById('student-display').innerText = `${l}, ${f} (${p})`;
+    document.getElementById('student-login').classList.add('hidden-section');
+    document.getElementById('quiz-container').classList.remove('hidden-section');
+
+    renderQuestions();
+    window.scrollTo(0, 0);
+}
+
+function renderQuestions() {
+    const container = document.getElementById('questions-list');
+    container.innerHTML = currentSessionQuiz.map((q, index) => `
+        <div class="mb-6 p-5 border border-gray-200 rounded-xl hover:shadow-md transition bg-gray-50" id="q-box-${index}">
+            <div class="flex items-start gap-3">
+                <span class="bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded text-sm h-fit mt-1">${index + 1}</span>
+                <div class="w-full">
+                    <p class="font-semibold text-lg mb-4 text-gray-800">${q.q}</p>
+                    
+                    <div class="space-y-3 mb-4">
+                        ${q.options.map((opt, optIndex) => `
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-emerald-100 hover:border-emerald-300 transition group">
+                                <input type="radio" name="q${index}" value="${optIndex}" class="form-radio h-5 w-5 text-emerald-600 focus:ring-emerald-500">
+                                <span class="group-hover:text-emerald-900">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function submitExam() {
+    const answers = [];
+    let totalPoints = 0; 
+    let missedIndices = []; 
+
+    for (let i = 0; i < currentSessionQuiz.length; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        
+        if (!selected) {
+            alert(`You missed Question ${i + 1}. Please answer all questions before submitting.`);
+            document.getElementById(`q-box-${i}`).scrollIntoView({behavior: "smooth", block: "center"});
+            document.getElementById(`q-box-${i}`).classList.add('border-red-500', 'bg-red-50');
+            setTimeout(() => document.getElementById(`q-box-${i}`).classList.remove('border-red-500', 'bg-red-50'), 2000);
+            return;
+        }
+
+        const val = parseInt(selected.value);
+        answers.push(val);
+        
+        const currentQ = currentSessionQuiz[i];
+
+        if (val === currentQ.a) {
+            totalPoints += 2;
+        } else {
+            missedIndices.push(currentQ.originalIndex);
+        }
+    }
+
+    const finalScore = totalPoints; 
+    
+    const resultPayload = {
+        name: `${studentData.lname}, ${studentData.fname}`,
+        period: studentData.period,
+        score: finalScore,
+        rawScore: totalPoints,
+        total: quizData.length,
+        missed: missedIndices,
+        timestamp: new Date().toISOString()
+    };
+
+    lastResultData = resultPayload;
+
+    document.getElementById('quiz-container').classList.add('hidden-section');
+    document.getElementById('result-container').classList.remove('hidden-section');
+    document.getElementById('final-score-display').innerText = finalScore + "%";
+    window.scrollTo(0, 0);
+    
+    downloadResult(resultPayload);
+}
+
+function downloadResult(data) {
+    if (!data) return;
+    
+    const headers = ["Name", "Period", "Score", "RawScore", "Total", "Timestamp", "MissedQuestionIndices"];
+    const safeName = data.name.replace(/"/g, '""');
+    const missedStr = data.missed.join('|');
+    
+    const row = [
+        `"${safeName}"`,
+        `"${data.period}"`,
+        data.score,
+        data.rawScore,
+        data.total,
+        `"${data.timestamp}"`,
+        `"${missedStr}"`
+    ];
+    
+    const csvContent = headers.join(",") + "\n" + row.join(",");
+    const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+    const downloadAnchorNode = document.createElement('a');
+    const fileName = `Result_${studentData.lname.replace(/[^a-z0-9]/gi, '')}_${studentData.fname.replace(/[^a-z0-9]/gi, '')}.csv`;
+    
+    document.getElementById('filename-display').innerText = fileName;
+    
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", fileName);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+// --- Teacher Flow ---
+
+function toggleTeacherModal() {
+    const modal = document.getElementById('password-modal');
+    modal.classList.toggle('hidden');
+    document.getElementById('pwd-error').classList.add('hidden');
+    document.getElementById('teacher-pwd').value = "";
+    if(!modal.classList.contains('hidden')) {
+        setTimeout(() => document.getElementById('teacher-pwd').focus(), 100);
+    }
+}
+
+function verifyTeacher() {
+    const pwd = document.getElementById('teacher-pwd').value;
+    if (pwd === TEACHER_PASSWORD) {
+        toggleTeacherModal();
+        document.getElementById('student-login').classList.add('hidden-section');
+        document.getElementById('quiz-container').classList.add('hidden-section');
+        document.getElementById('result-container').classList.add('hidden-section');
+        document.getElementById('teacher-dashboard').classList.remove('hidden-section');
+    } else {
+        document.getElementById('pwd-error').classList.remove('hidden');
+    }
+}
+
+function logoutTeacher() {
+    location.reload();
+}
+
+window.toggleTeacherModal = toggleTeacherModal;
+window.verifyTeacher = verifyTeacher;
+window.logoutTeacher = logoutTeacher;
+
+// --- Dashboard Logic ---
+
+let classResults = [];
+
+function handleDrop(e) {
+    e.preventDefault();
+    handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(files) {
+    Array.from(files).forEach(file => {
+        if (!file.name.toLowerCase().endsWith('.csv')) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const text = e.target.result;
+                const lines = text.trim().split('\n');
+                if (lines.length < 2) return; 
+                
+                const rowStr = lines[1];
+                const matches = rowStr.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+                
+                if (!matches || matches.length < 7) throw new Error("Invalid CSV");
+
+                const clean = (str) => str ? str.replace(/^"|"$/g, '').replace(/""/g, '"') : "";
+
+                const res = {
+                    name: clean(matches[0]),
+                    period: clean(matches[1]),
+                    score: parseInt(matches[2]),
+                    rawScore: parseInt(matches[3]),
+                    total: parseInt(matches[4]),
+                    timestamp: clean(matches[5]),
+                    missed: clean(matches[6]).split('|').filter(s => s !== "").map(Number)
+                };
+
+                if(!classResults.some(r => r.name === res.name && r.timestamp === res.timestamp)) {
+                    classResults.push(res);
+                }
+                updateDashboard();
+            } catch (err) {
+                console.error("Error parsing file:", file.name, err);
+            }
+        };
+        reader.readAsText(file);
+    });
+}
+
+function updateDashboard() {
+    const totalStudents = classResults.length;
+    const avgScore = Math.round(classResults.reduce((acc, curr) => acc + curr.score, 0) / totalStudents) || 0;
+    const highScore = Math.max(...classResults.map(r => r.score), 0);
+
+    document.getElementById('stat-count').innerText = totalStudents;
+    document.getElementById('stat-avg').innerText = avgScore + "%";
+    document.getElementById('stat-high').innerText = highScore + "%";
+
+    const tbody = document.getElementById('results-table-body');
+    tbody.innerHTML = classResults.map(r => `
+        <tr class="border-b hover:bg-gray-50 transition">
+            <td class="p-3 font-medium text-gray-800">${r.name}</td>
+            <td class="p-3 text-gray-500">${r.period}</td>
+            <td class="p-3 font-bold ${getScoreColor(r.score)}">${r.score}%</td>
+            <td class="p-3 text-xs text-gray-400 break-words max-w-xs">${formatMissed(r.missed)}</td>
+        </tr>
+    `).join('');
+
+    const questionMissCounts = {};
+    classResults.forEach(r => {
+        r.missed.forEach(qIdx => {
+            if (!isNaN(qIdx)) {
+                questionMissCounts[qIdx] = (questionMissCounts[qIdx] || 0) + 1;
+            }
+        });
+    });
+
+    const sortedMissed = Object.keys(questionMissCounts)
+        .map(key => ({ 
+            index: parseInt(key), 
+            count: questionMissCounts[key], 
+            text: quizData[key].q 
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 3);
+
+    const missedContainer = document.getElementById('missed-questions-list');
+    if (sortedMissed.length > 0) {
+        missedContainer.innerHTML = sortedMissed.map(item => {
+            const pct = Math.round((item.count / totalStudents) * 100);
+            return `
+                <div class="flex items-start bg-white p-3 rounded-lg border shadow-sm">
+                    <span class="bg-red-100 text-red-800 font-bold px-2 py-1 rounded text-xs mr-3 mt-0.5">Q${item.index + 1}</span>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-800">${item.text}</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                        <p class="text-xs text-right text-red-600 mt-1 font-semibold">${pct}% of class missed this</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        missedContainer.innerHTML = `<p class="text-gray-500 italic text-center">No incorrect answers yet!</p>`;
+    }
+}
+
+function formatMissed(missedArr) {
+    if (!missedArr || missedArr.length === 0) return '<span class="text-green-500"><i class="fas fa-check"></i> Perfect</span>';
+    return missedArr.map(i => i + 1).join(', ');
+}
+
+function getScoreColor(score) {
+    if(score >= 90) return 'text-green-600';
+    if(score >= 70) return 'text-yellow-600';
+    return 'text-red-600';
+}
+</script>
+</body>
+</html>
